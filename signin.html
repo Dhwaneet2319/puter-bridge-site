@@ -1,0 +1,41 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Puter Sign-in for Jarvis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { color-scheme: dark; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:#0b1220; color:#e6edf3; display:grid; place-items:center; height:100vh; }
+    .card { background:#111a2e; border:1px solid #233; padding:20px; border-radius:12px; width: min(420px, calc(100% - 32px)); }
+    button { background:#244a9b; color:#fff; border:0; padding:12px 14px; border-radius:10px; cursor:pointer; width:100%; font-size:16px; }
+    .muted { margin-top:10px; opacity:.8; font-size:14px; }
+    pre { white-space:pre-wrap; background:#091426; border:1px solid #233; padding:10px; border-radius:8px; max-height:160px; overflow:auto; }
+  </style>
+  <script src="https://js.puter.com/v2/"></script>
+</head>
+<body>
+  <div class="card">
+    <h2>Sign in to Puter</h2>
+    <p class="muted">Click the button below. A Puter popup may open; complete the flow, and this window will close automatically.</p>
+    <button id="go">Sign in</button>
+    <div id="out" class="muted"></div>
+  </div>
+  <script>
+    const out = document.getElementById('out');
+    document.getElementById('go').addEventListener('click', async () => {
+      out.textContent = 'Opening Puter…';
+      try {
+        await puter.auth.signIn().then((res) => {
+          out.textContent = 'Signed in. Notifying Jarvis…';
+          try { window.opener && window.opener.postMessage({ type:'PUTER_SIGNED_IN' }, '*'); } catch (e) {}
+          setTimeout(() => { window.close(); }, 400);
+        });
+      } catch (e) {
+        out.textContent = 'Sign-in error: ' + (e && e.message ? e.message : e);
+      }
+    });
+  </script>
+</body>
+</html>
